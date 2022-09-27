@@ -285,8 +285,6 @@ class FcpXmlWriter:
                 if child.attrib:
                     if child.attrib.get("name", "") == "black":
                         elms_to_remove.append(child)
-                    elif child.attrib.get("name", "").split(".")[-1].lower() in ["wav", "flac"]:
-                        child.tag = "audio"
             for elm in elms_to_remove:
                 resources.remove(elm)
             elms_to_remove = []
