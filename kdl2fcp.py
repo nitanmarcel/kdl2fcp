@@ -97,9 +97,11 @@ def selectFirst(node, selector):
 
 class KdenliveReader:
 
-    def __init__(self):
-        self.version = 1
-        self._parseTime = self._parseTimeStr
+    def __init__(self, force_time_frames=False, force_time_timestamp=False):
+        self.force_time_frames = force_time_frames if not force_time_timestamp else False
+        self.force_time_timestamp = force_time_timestamp if not force_time_frames else False
+        self.version = 0 if force_time_frames else 1
+        self._parseTime = self._parseTimeFrames if self.time_parse_type == "frames" else self._parseTimeStr
 
     def _parseTimeStr(self, time_str, frame_rate):
         pattern = re.compile(r"(\d\d):(\d\d):(\d\d).(\d\d\d)")
@@ -117,9 +119,10 @@ class KdenliveReader:
         self.soup = None
         with open(filename, "r") as input_file:
             content = input_file.read()
-            if re.search(r"<property name=\"kdenlive:docproperties\.version\">0\.\d\d</property>", content, flags=re.M):
-                self._parseTime = self._parseTimeFrames
-                self.version = 0
+            if self.time_parse_type == "auto":
+                if re.search(r"<property name=\"kdenlive:docproperties\.version\">0\.\d\d</property>", content, flags=re.M) or self.force_time_frames == True:
+                    self._parseTime = self._parseTimeFrames
+                    self.version = 0
             self.soup = BeautifulSoup(content, "lxml-xml")
         self.project = Project()
 
@@ -245,7 +248,13 @@ class KdenliveReader:
 
             if track.entries:
                 self.project.addTrack(track)
-
+    @property
+    def time_parse_type(self):
+        if self.force_time_timestamp:
+            return "timestamp"
+        elif self.force_time_frames:
+            return "frames"
+        return "auto"
 
 # =============================================================================
 #  FCP XML writer.
@@ -441,6 +450,12 @@ if __name__ == "__main__":
                             help="Unclear whether these are necessary, since every clip has an absolute offset anyway.")
     arg_parser.add_argument("-l", "--legacy-format", required=False, action="store_true",
                             help="Use the old, unmodified format with unremoved lines.")
+
+    arg_parser.add_argument("-f", "--timing-as-framenumber", required=False, action="store_true",
+                            help="Force timing information to be parsed as framenumber.")
+
+    arg_parser.add_argument("-t", "--timing-as-timestamp", required=False, action="store_true",
+                            help="Force timing information to be parsed as timestamp.")
     args = arg_parser.parse_args()
 
     if args.output:
@@ -451,7 +466,7 @@ if __name__ == "__main__":
     EMBEDDED_MLT_TO_COMPOUND_CLIP = args.embedded_mlt_to_compound_clip
     ADD_GAP_NODES = args.add_gap_nodes
 
-    reader = KdenliveReader()
+    reader = KdenliveReader(force_time_frames=args.timing_as_framenumber, force_time_timestamp=args.timing_as_timestamp)
     project = reader.read(args.FILE[0])
     is_legacy = args.legacy_format
     if reader.version == 1:
