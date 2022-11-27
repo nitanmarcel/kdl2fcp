@@ -441,7 +441,7 @@ class FcpXmlWriter:
 # =============================================================================
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument("FILE", nargs="+", help="Input file")
+    arg_parser.add_argument("FILE", nargs="+", help="Input file(s). Glob patters supported.")
     arg_parser.add_argument("-o", "--output", required=False,
                             help="Output file. If the output filename is not given, replaces the extension of the input file with .fcpxml.")
     arg_parser.add_argument("-e", "--embedded-mlt-to-compound-clip", required=False, action="store_true", help=("Whether to turn an embedded .kdenlive file into a compound clip, or leave it alone."
