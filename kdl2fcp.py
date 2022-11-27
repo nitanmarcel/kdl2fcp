@@ -15,6 +15,7 @@
 import argparse
 import os
 import os.path
+import glob
 import re
 
 from bs4 import BeautifulSoup
@@ -440,7 +441,7 @@ class FcpXmlWriter:
 # =============================================================================
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument("FILE", nargs=1, help="Input file")
+    arg_parser.add_argument("FILE", nargs="+", help="Input file")
     arg_parser.add_argument("-o", "--output", required=False,
                             help="Output file. If the output filename is not given, replaces the extension of the input file with .fcpxml.")
     arg_parser.add_argument("-e", "--embedded-mlt-to-compound-clip", required=False, action="store_true", help=("Whether to turn an embedded .kdenlive file into a compound clip, or leave it alone."
@@ -458,18 +459,25 @@ if __name__ == "__main__":
                             help="Force timing information to be parsed as timestamp.")
     args = arg_parser.parse_args()
 
-    if args.output:
-        output_filename = args.output
-    else:
-        output_filename = os.path.splitext(args.FILE[0])[0] + ".fcpxml"
 
     EMBEDDED_MLT_TO_COMPOUND_CLIP = args.embedded_mlt_to_compound_clip
     ADD_GAP_NODES = args.add_gap_nodes
-
     reader = KdenliveReader(force_time_frames=args.timing_as_framenumber, force_time_timestamp=args.timing_as_timestamp)
-    project = reader.read(args.FILE[0])
-    is_legacy = args.legacy_format
-    if reader.version == 1:
-        is_legacy = True
-    writer = FcpXmlWriter(project, is_legacy) 
-    writer.write(output_filename)
+
+
+    files_len = len(args.FILE)
+
+    for file in args.FILE:
+        for glob_file in glob.glob(file):
+            if args.output:
+                if os.path.isdir(args.output):
+                    output_filename = os.path.join(args.output, (os.path.splitext(file)[0] + ".fcpxml").rsplit(os.sep)[-1])
+                else:
+                    output_filename = args.output
+            else:
+                output_filename = os.path.splitext(file)[0] + ".fcpxml"
+            is_legacy = args.legacy_format
+            if reader.version == 1:
+                is_legacy = True
+            project = reader.read(file)
+            FcpXmlWriter(project, is_legacy).write(output_filename)
