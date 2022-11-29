@@ -481,8 +481,7 @@ if __name__ == "__main__":
                     else:
                         output_filename = args.output
                 else:
-                    output_filename = os.path.splitext(args.FILE[0])[0] + ".fcpxml"
-                print(output_filename)
+                    output_filename = os.path.splitext(file)[0] + ".fcpxml"
                 convert(file, output_filename)
             else:
                 print("Skipping glob %s as it doesn't exist" % file_args)
