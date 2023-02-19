@@ -183,7 +183,7 @@ class KdenliveReader:
                 if clip_name_attr:
                     clip_name = clip_name_attr.text
                     if not clip_name:
-                        clip_name = clip_id
+                        clip_name = os.path.basename(resource_path)
 
                 if EMBEDDED_MLT_TO_COMPOUND_CLIP and resource_path.endswith(".kdenlive"):
                     reader = KdenliveReader()
