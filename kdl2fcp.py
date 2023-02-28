@@ -98,10 +98,11 @@ def selectFirst(node, selector):
 
 class KdenliveReader:
 
-    def __init__(self, force_time_frames=False, force_time_timestamp=False):
+    def __init__(self, force_time_frames=False, force_time_timestamp=False, legacy_format=False):
         self.force_time_frames = force_time_frames if not force_time_timestamp else False
         self.force_time_timestamp = force_time_timestamp if not force_time_frames else False
         self.version = 0 if force_time_frames else 1
+        self.legacy_format = legacy_format
         self._parseTime = self._parseTimeFrames if self.time_parse_type == "frames" else self._parseTimeStr
 
     def _parseTimeStr(self, time_str, frame_rate):
@@ -221,8 +222,17 @@ class KdenliveReader:
             playlist_id = playlist["id"]
             if playlist_id == "main_bin":
                 continue
-
             is_audio = playlist_id in audio_playlist_ids
+            entry = selectFirst(playlist, "entry")
+            if self.legacy_format or self.version == 0:
+                if entry:
+                    producers = self.soup.select("producer")
+                    for producer in producers:
+                        if producer["id"] == entry["producer"]:
+                            video_index = selectFirst(producer, "property[name=video_index]")
+                            if video_index:
+                                is_audio = int(video_index.text) == -1
+
             track = Track(is_audio)
 
             print("Playlist:", playlist_id,
@@ -437,9 +447,10 @@ class FcpXmlWriter:
 
 
 def convert(file_name, out=None):
-    reader = KdenliveReader(force_time_frames=args.timing_as_framenumber, force_time_timestamp=args.timing_as_timestamp)
+    reader = KdenliveReader(force_time_frames=args.timing_as_framenumber, force_time_timestamp=args.timing_as_timestamp, legacy_format=args.legacy_format)
     project = reader.read(file_name)
     is_legacy = args.legacy_format
+    print(reader.version)
     if reader.version == 1:
         is_legacy = True
     writer = FcpXmlWriter(project, is_legacy) 
