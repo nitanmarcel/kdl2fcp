@@ -414,7 +414,7 @@ class FcpXmlWriter:
                     clip_node["srcEnable"] = "audio" if track.is_audio else "video"
                     self._addFakeTimemap(clip_node)
                 if track.is_audio:
-                    clip_node["srcCh"] = "1,2"
+                    clip_node["srcCh"] = "1, 2"
 
                 clip_node["name"] = clip.name
                 clip_node["ref"] = clip.clip_id
