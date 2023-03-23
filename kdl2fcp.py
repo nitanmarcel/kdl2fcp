@@ -340,6 +340,9 @@ class FcpXmlWriter:
                 asset["src"] = "file://" + resource.resource_path
                 asset["hasVideo"] = 1
                 asset["duration"] = self._formatTime(clip.duration)
+                asset["audioChannels"] = 2
+                asset["audioSources"] = 1
+                asset["hasAudio"] = 1
             elif isinstance(resource, Project):
                 self._addEmbeddedTimeline(clip_id, resources_tag)
 
@@ -410,6 +413,8 @@ class FcpXmlWriter:
                     clip_node = self._addTag(spine, "ref-clip")
                     clip_node["srcEnable"] = "audio" if track.is_audio else "video"
                     self._addFakeTimemap(clip_node)
+                if track.is_audio:
+                    clip_node["srcCh"] = "1,2"
 
                 clip_node["name"] = clip.name
                 clip_node["ref"] = clip.clip_id
