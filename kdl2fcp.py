@@ -55,22 +55,19 @@ class Track:
         self.entries.append(entry)
 
 
-global_embed_counter = 0
-
-
 class Project:
     def __init__(self):
         self.clips = {}
         self.tracks = []
         self.frame_rate = None
 
-        global global_embed_counter
-        if global_embed_counter == 0:
+        self.global_embed_counter = 0
+        if self.global_embed_counter == 0:
             self.id_prefix = "ROOT_" if EMBEDDED_MLT_TO_COMPOUND_CLIP else ""
         else:
-            self.id_prefix = "EMB_%02d_" % global_embed_counter
+            self.id_prefix = "EMB_%02d_" % self.global_embed_counter
 
-        global_embed_counter += 1
+        self.global_embed_counter += 1
 
     def addClip(self, clip_id, clip):
         self.clips[clip_id] = clip
@@ -501,3 +498,4 @@ if __name__ == "__main__":
                 convert(file, output_filename)
             else:
                 print("Skipping glob %s as it doesn't exist" % file_args)
+n't exist" % file_args)
