@@ -468,7 +468,7 @@ if __name__ == "__main__":
     arg_parser.add_argument("-o", "--output", required=False,
                             help="Output file. If the output filename is not given, replaces the extension of the input file with .fcpxml.")
     arg_parser.add_argument("-e", "--embedded-mlt-to-compound-clip", required=False, action="store_true", help=("Whether to turn an embedded .kdenlive file into a compound clip, or leave it alone."
-                                                                                                                " Doesn't work in all cases. A possible workaround is to convert the embedded .kdenlive independently,"
+                                                                                                                " Doesn\'t work in all cases. A possible workaround is to convert the embedded .kdenlive independently,"
                                                                                                                 " import it as a timeline in Resolve, and replacing the missing clip with the imported timeline."))
     arg_parser.add_argument("-g", "--add-gap-nodes", required=False, action="store_true",
                             help="Unclear whether these are necessary, since every clip has an absolute offset anyway.")
@@ -497,5 +497,4 @@ if __name__ == "__main__":
                     output_filename = os.path.splitext(file)[0] + ".fcpxml"
                 convert(file, output_filename)
             else:
-                print("Skipping glob %s as it doesn't exist" % file_args)
-n't exist" % file_args)
+                print("Skipping glob %s as it doesn\'t exist" % file_args)
