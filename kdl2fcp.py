@@ -122,7 +122,7 @@ class KdenliveReader:
                 if re.search(r"<property name=\"kdenlive:docproperties\.version\">0\.\d\d</property>", content, flags=re.M) or self.force_time_frames == True:
                     self._parseTime = self._parseTimeFrames
                     self.version = 0
-            self.soup = BeautifulSoup(content, "lxml-xml")
+            self.soup = BeautifulSoup(content, "lxml")
         self.project = Project()
 
         self._parseSettings()
